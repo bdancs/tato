@@ -21,6 +21,8 @@ for index, row in df.iterrows():
     orgao_cnpj = row['orgao_cnpj']
     ano = row['ano']
     numero = row['numero_sequencial']
+    title = row['title']            # Adicionar aqui colunas desejadas do primeiro arquivo
+    description = row['description']  
 
     # Verificar se os valores necessários não são nulos
     if pd.isnull(orgao_cnpj) or pd.isnull(ano) or pd.isnull(numero):
@@ -49,6 +51,8 @@ for index, row in df.iterrows():
                 item['orgao_cnpj'] = orgao_cnpj
                 item['ano'] = ano
                 item['numero_sequencial'] = numero
+                item['title'] = title                # Adicionar aqui colunas desejadas do primeiro arquivo
+                item['description'] = description
 
             all_items.extend(data)
         else:
@@ -64,9 +68,31 @@ for index, row in df.iterrows():
 if all_items:
     # Criar um DataFrame com todos os itens
     items_df = pd.DataFrame(all_items)
+
+    #Colocar todas colunas desejadas
+    colunas_desejadas = [
+        'title',
+        'description',
+        'numeroItem',
+        'descricao',
+        'materialOuServico',
+        'materialOuServicoNome',
+        'valorUnitarioEstimado',
+        'valorTotal',
+        'quantidade',
+        'unidadeMedida',
+        'orcamentoSigiloso',
+        'itemCategoriaId'
+    ]
+
+    # Verificar se todas as colunas existem no DataFrame
     df_filtrado = items_df[items_df['materialOuServico'] == 'M']
     df_filtrado_orcamento = df_filtrado[df_filtrado['orcamentoSigiloso'] == False]
+    colunas_existentes = [col for col in colunas_desejadas if col in df_filtrado_orcamento.columns]
 
+    df_filtrado_orcamento = df_filtrado_orcamento[colunas_existentes]
+
+    print(df_filtrado_orcamento.head(2))
     # Salvar em um arquivo Excel
     df_filtrado_orcamento.to_excel('itens_coletados.xlsx', index=False)
     print('Todos os itens foram salvos em "itens_coletados.xlsx"')
